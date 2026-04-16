@@ -1,0 +1,354 @@
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* ── DEFAULT DARK THEME (Variables) ────────────────────────────────────────── */
+:root {
+    --bg-main: #080b14;
+    --bg-card: rgba(13,17,32,0.7);
+    --bg-sidebar: #0d1120;
+    --border-color: rgba(255,255,255,0.07);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --accent-glow: rgba(99,102,241,0.18);
+    --sidebar-border: rgba(99,102,241,0.15);
+    --slider-bg: rgba(255,255,255,0.05);
+    --metric-bg: rgba(13,17,32,0.8);
+    --code-bg: rgba(0,0,0,0.35);
+}
+
+/* ── Base reset ────────────────────────────────────────────────────────────── */
+html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+
+/* ── App background ─────────────────────────────────────────────────────────  */
+.stApp {
+    background: var(--bg-main) !important;
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, var(--accent-glow) 0%, transparent 60%) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: var(--bg-sidebar) !important;
+    border-right: 1px solid var(--sidebar-border) !important;
+}
+[data-testid="stSidebar"] > div { padding-top: 1rem; }
+
+/* Fix visibility of ALL sidebar text including labels and headers */
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span {
+    color: var(--text-secondary) !important;
+}
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] strong,
+[data-testid="stSidebar"] b { 
+    color: var(--text-primary) !important; 
+}
+
+/* Explicit fix for checkbox labels which were reported as non-visible */
+[data-testid="stCheckbox"] label div p {
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
+}
+[data-testid="stCheckbox"] label p {
+    color: var(--text-secondary) !important;
+}
+
+/* ── Slider visibility ───────────────────────────────────────────────────── */
+[data-testid="stSlider"] > div > div > div > div {
+    background: linear-gradient(90deg, #6366f1, #10b981) !important;
+}
+[data-testid="stSlider"] [data-testid="stWidgetLabel"] p,
+[data-testid="stSlider"] label p {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+/* Slider numbers/markers */
+[data-testid="stSlider"] div[role="presentation"] p,
+[data-testid="stSlider"] div[role="presentation"] span {
+    color: var(--text-secondary) !important;
+    font-size: 0.75rem !important;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 3rem !important;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero-wrap { text-align: center; padding: 2.5rem 1rem 1.5rem; }
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.4);
+    color: #a5b4fc;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 18px;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 45%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 0.8rem;
+}
+
+.hero-sub {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* ── Glowing divider ─────────────────────────────────────────────────────── */
+.glow-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(16,185,129,0.45), transparent);
+    margin: 1.5rem 0;
+    border: none;
+}
+
+/* ── Algorithm cards ─────────────────────────────────────────────────────── */
+.algo-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.4rem 1.2rem;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s, transform 0.2s;
+    height: 100%;
+}
+.algo-card:hover {
+    border-color: rgba(99,102,241,0.45);
+    transform: translateY(-3px);
+}
+.algo-icon  { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.algo-name  { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.algo-tag {
+    display: inline-block;
+    font-size: 0.63rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 10px;
+    border-radius: 50px;
+    margin-bottom: 0.55rem;
+}
+.algo-desc { color: var(--text-secondary); font-size: 0.83rem; line-height: 1.6; }
+
+/* ── Metric cards ────────────────────────────────────────────────────────── */
+.metric-card {
+    background: var(--metric-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    margin-bottom: 0.6rem;
+    transition: border-color 0.25s;
+}
+.metric-card:hover { border-color: rgba(99,102,241,0.3); }
+.metric-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 4px 0;
+    color: var(--text-primary);
+}
+.metric-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+.metric-sub         { display: flex; justify-content: space-around; margin-top: 0.8rem; }
+.metric-sub-val     { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.metric-sub-label   { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── Section title ───────────────────────────────────────────────────────── */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* ── Primary button ──────────────────────────────────────────────────────── */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 0.65rem 2rem !important;
+    letter-spacing: 0.3px !important;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.35) !important;
+    transition: box-shadow 0.2s, transform 0.15s !important;
+}
+.stButton > button[kind="primary"]:hover {
+    box-shadow: 0 6px 28px rgba(99,102,241,0.6) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ── Download & Secondary buttons ────────────────────────────────────────── */
+[data-testid="stDownloadButton"] button,
+.stButton > button[kind="secondary"] {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.25s ease !important;
+}
+
+[data-testid="stDownloadButton"] button:hover,
+.stButton > button[kind="secondary"]:hover {
+    border-color: #6366f1 !important;
+    background: rgba(99,102,241,0.1) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
+}
+
+/* Force specific text color for p tags inside buttons (Streamlit internals) */
+[data-testid="stDownloadButton"] button p,
+.stButton > button[kind="secondary"] p {
+    color: var(--text-primary) !important;
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────────── */
+[data-testid="stProgressBar"] > div > div {
+    background: linear-gradient(90deg, #6366f1, #10b981) !important;
+    border-radius: 10px !important;
+}
+[data-testid="stProgressBar"] > div {
+    background: var(--slider-bg) !important;
+    border-radius: 10px !important;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+[data-testid="stTabs"] [role="tablist"] {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid var(--border-color);
+}
+[data-testid="stTabs"] [role="tab"] {
+    border-radius: 7px !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+    background: rgba(99,102,241,0.25) !important;
+    color: #6366f1 !important;
+}
+
+/* ── Rules panel ─────────────────────────────────────────────────────────── */
+.rules-card {
+    background: var(--metric-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.2rem 1.1rem;
+    font-size: 0.83rem;
+    line-height: 2;
+    color: var(--text-secondary);
+    height: 100%;
+}
+.rules-divider { border-color: var(--border-color); margin: 0.6rem 0; }
+
+/* ── Save / Load card ────────────────────────────────────────────────────── */
+.io-card {
+    background: var(--metric-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.4rem 1.3rem;
+    margin-bottom: 1rem;
+}
+.io-card-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+}
+
+/* ── Theory cards ────────────────────────────────────────────────────────── */
+.theory-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.4rem 1.3rem;
+    height: 100%;
+}
+.theory-card code, .theory-card pre {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.76rem !important;
+    background: var(--code-bg) !important;
+    border-radius: 6px !important;
+    padding: 0.8rem 1rem !important;
+    color: #10b981 !important;
+    display: block;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    margin-top: 0.5rem;
+}
+
+/* ── Insight cards ───────────────────────────────────────────────────────── */
+.insight-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.2rem 1.1rem;
+    transition: border-color 0.25s;
+}
+.insight-card:hover { border-color: rgba(99,102,241,0.35); }
+.insight-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
+.insight-body  { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.7; }
+
+/* ── Score live card ─────────────────────────────────────────────────────── */
+.score-live-card {
+    background: var(--metric-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.8rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+/* ── Checkbox ────────────────────────────────────────────────────────────── */
+[data-testid="stCheckbox"] label {
+    color: var(--text-secondary) !important;
+}
+
+/* ── DataFrame ───────────────────────────────────────────────────────────── */
+[data-testid="stDataFrame"] { border-radius: 12px; overflow: hidden; }
+
+/* ── Alert ───────────────────────────────────────────────────────────────── */
+.stAlert { border-radius: 10px !important; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 10px; }
