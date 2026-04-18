@@ -28,6 +28,14 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
     color: var(--text-primary) !important;
 }
 
+/* ── Header / Toolbar ────────────────────────────────────────────────────── */
+header[data-testid="stHeader"] {
+    background: transparent !important;
+}
+[data-testid="stHeader"] svg {
+    fill: var(--text-primary) !important;
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
     background: var(--bg-sidebar) !important;

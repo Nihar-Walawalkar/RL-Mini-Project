@@ -82,7 +82,7 @@ def style_ax(ax, title="", xlabel="", ylabel=""):
     ax.tick_params(colors=MPL_TICK, labelsize=7)
     for spine in ax.spines.values():
         spine.set_color(MPL_SPINE)
-    ax.grid(alpha=0.2 if is_light else 0.12, color=MPL_GRID, linewidth=0.7)
+    ax.grid(alpha=0.12, color=MPL_GRID, linewidth=0.7)
 
 
 def _legend(ax):
@@ -95,16 +95,16 @@ def render_grid(frame, grid_size, title, body_color, game_over=False):
     fig.patch.set_facecolor(MPL_BG)
     ax.set_facecolor(MPL_AX_BG)
     
-    empty_color = [0.94, 0.96, 0.99] if is_light else [0.04, 0.06, 0.12]
+    empty_color = [0.04, 0.06, 0.12]
     img = np.zeros((*frame.shape, 3))
     cmap = {0: empty_color, 1: hex_to_rgb(body_color),
-            2: [0.1, 0.1, 0.1] if is_light else [1.0, 1.0, 1.0],   # Head color
-            3: [0.8, 0.6, 0.0] if is_light else [1.0, 0.82, 0.0]}  # Food color
+            2: [1.0, 1.0, 1.0],   # Head color
+            3: [1.0, 0.82, 0.0]}  # Food color
     for val, rgb in cmap.items():
         img[frame == val] = rgb
     
     if game_over:
-        img *= 0.5 if is_light else 0.28
+        img *= 0.28
     
     ax.imshow(img, interpolation="nearest")
     ax.set_xticks(np.arange(-0.5, grid_size, 1), minor=True)
@@ -141,7 +141,7 @@ def draw_live_chart(live_data: dict):
         x_axis = list(range(1, eps + 1))
         for ax, key in zip(axes, ("rewards", "scores")):
             raw = data[key]
-            ax.plot(x_axis, raw, alpha=0.15 if is_light else 0.08, color=color, linewidth=0.7)
+            ax.plot(x_axis, raw, alpha=0.08, color=color, linewidth=0.7)
             sm = smooth(raw, min(20, max(1, eps // 10)))
             ax.plot(np.linspace(1, eps, len(sm)), sm, color=color, linewidth=2.0, label=name)
             
@@ -168,12 +168,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("**🎨 Appearance**")
-    theme_mode = st.radio("Theme", ["Dark", "Light"], label_visibility="collapsed")
-    is_light = theme_mode == "Light"
-
-    st.markdown("<hr style='border-color:rgba(99,102,241,0.2); margin:0.5rem 0 1rem;'>", unsafe_allow_html=True)
-    
     st.markdown("**⚙️ Training Config**")
     episodes  = st.slider("Episodes", 200, 3000, 800, 100)
     grid_size = st.select_slider("Grid Size", [8, 10, 12], value=10)
@@ -211,27 +205,6 @@ import os as _os
 _css_path = _os.path.join(_os.path.dirname(__file__), "style.css")
 with open(_css_path) as _f:
     _css_content = _f.read()
-    
-# If light mode is selected, we override the :root variables defined in style.css
-if is_light:
-    _light_vars = """
-    :root {
-        --bg-main: #f8fafc;
-        --bg-card: rgba(255,255,255,0.8);
-        --bg-sidebar: #f1f5f9;
-        --border-color: rgba(0,0,0,0.08);
-        --text-primary: #0f172a;
-        --text-secondary: #475569;
-        --text-muted: #94a3b8;
-        --accent-glow: rgba(99,102,241,0.08);
-        --sidebar-border: rgba(99,102,241,0.1);
-        --slider-bg: rgba(0,0,0,0.05);
-        --metric-bg: rgba(255,255,255,0.9);
-        --code-bg: rgba(0,0,0,0.05);
-    }
-    """
-    _css_content += f"<style>{_light_vars}</style>"
-
 st.markdown(f"<style>{_css_content}</style>", unsafe_allow_html=True)
 del _os, _css_path, _f
 
@@ -245,14 +218,14 @@ ALGO_COLORS = {
     "DQN":               "#ec4899",
 }
 
-# Theme-aware colors for Matplotlib
-MPL_BG     = "#f8fafc" if is_light else "#080b14"
-MPL_AX_BG  = "#ffffff" if is_light else "#0d1120"
-MPL_GRID   = "#e2e8f0" if is_light else "#1e2540"
-MPL_LABEL  = "#475569" if is_light else "#64748b"
-MPL_TICK   = "#94a3b8" if is_light else "#475569"
-MPL_SPINE  = "#cbd5e1" if is_light else "#1e2540"
-MPL_TEXT   = "#0f172a" if is_light else "#e2e8f0"
+# Dark theme colors for Matplotlib
+MPL_BG     = "#080b14"
+MPL_AX_BG  = "#0d1120"
+MPL_GRID   = "#1e2540"
+MPL_LABEL  = "#64748b"
+MPL_TICK   = "#475569"
+MPL_SPINE  = "#1e2540"
+MPL_TEXT   = "#e2e8f0"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -419,6 +392,9 @@ if "results" in st.session_state:
     episodes  = st.session_state["episodes"]
 
     # ── Watch agents ──────────────────────────────────────────────────────────
+    if "is_playing" not in st.session_state:
+        st.session_state.is_playing = False
+
     st.markdown("<hr class='glow-divider'>", unsafe_allow_html=True)
     st.markdown("""
     <div class='hero-wrap' style='padding:1.2rem 0 0.8rem;'>
@@ -429,12 +405,25 @@ if "results" in st.session_state:
         </div>
     </div>""", unsafe_allow_html=True)
 
-    ctrl_col, _ = st.columns([1, 3])
-    with ctrl_col:
+    ctrl_col1, ctrl_col2, _ = st.columns([1, 1, 2])
+    with ctrl_col1:
         play_speed = st.slider("Frame delay (ms)", 50, 400, 120, 10)
-        play_btn   = st.button("▶️  Play All Agents", use_container_width=True, type="primary")
+    
+    with ctrl_col2:
+        st.write("<div style='height:28px;'></div>", unsafe_allow_html=True)
+        if not st.session_state.is_playing:
+            if st.button("▶️  Play All Agents", use_container_width=True, type="primary"):
+                st.session_state.is_playing = True
+                st.rerun()
+        else:
+            if st.button("⏹️  Stop Simulation", use_container_width=True):
+                st.session_state.is_playing = False
+                st.rerun()
 
-    if play_btn:
+    # Placeholders for gameplay
+    game_container = st.container()
+    
+    if st.session_state.is_playing:
         all_frames, all_scores, all_deaths = {}, {}, {}
         for name, res in results.items():
             f, s, d = run_episode_visual(res["agent"], grid_size)
@@ -448,42 +437,50 @@ if "results" in st.session_state:
         death_icons = {"wall": "🧱 Wall", "self": "🐍 Self-collision", "timeout": "⏱️ Timeout"}
 
         score_ph, game_ph = {}, {}
-        game_area, rules_panel = st.columns([3, 1])
+        with game_container:
+            game_area, rules_panel = st.columns([3, 1])
 
-        with rules_panel:
-            st.markdown("""
-            <div class='rules-card'>
-                <div style='font-size:0.92rem; font-weight:700; color:#e2e8f0; margin-bottom:0.8rem;'>
-                    📋 Reward Structure
-                </div>
-                🍎 Eat food<br>
-                <span style='color:#10b981; font-weight:600; font-size:0.8rem;'>+10 reward</span>
-                <hr class='rules-divider'>
-                🧱 Hit wall<br>
-                <span style='color:#ef4444; font-weight:600; font-size:0.8rem;'>−10 · ends episode</span>
-                <hr class='rules-divider'>
-                🐍 Hit itself<br>
-                <span style='color:#ef4444; font-weight:600; font-size:0.8rem;'>−10 · ends episode</span>
-                <hr class='rules-divider'>
-                ➡️ Move toward food<br>
-                <span style='color:#94a3b8; font-weight:600; font-size:0.8rem;'>+0.1 shaping</span>
-                <hr class='rules-divider'>
-                <div style='font-size:0.78rem; color:#334155;'>
-                    ⬜ White = Head<br>
-                    🟩 Colored = Body<br>
-                    🟨 Gold = Food
-                </div>
-            </div>""", unsafe_allow_html=True)
+            with rules_panel:
+                st.markdown("""
+                <div class='rules-card'>
+                    <div style='font-size:0.92rem; font-weight:700; color:#e2e8f0; margin-bottom:0.8rem;'>
+                        📋 Reward Structure
+                    </div>
+                    🍎 Eat food<br>
+                    <span style='color:#10b981; font-weight:600; font-size:0.8rem;'>+10 reward</span>
+                    <hr class='rules-divider'>
+                    🧱 Hit wall<br>
+                    <span style='color:#ef4444; font-weight:600; font-size:0.8rem;'>−10 · ends episode</span>
+                    <hr class='rules-divider'>
+                    🐍 Hit itself<br>
+                    <span style='color:#ef4444; font-weight:600; font-size:0.8rem;'>−10 · ends episode</span>
+                    <hr class='rules-divider'>
+                    ➡️ Move toward food<br>
+                    <span style='color:#94a3b8; font-weight:600; font-size:0.8rem;'>+0.1 shaping</span>
+                    <hr class='rules-divider'>
+                    <div style='font-size:0.78rem; color:#334155;'>
+                        ⬜ White = Head<br>
+                        🟩 Colored = Body<br>
+                        🟨 Gold = Food
+                    </div>
+                </div>""", unsafe_allow_html=True)
 
-        with game_area:
-            s_row = st.columns(len(names))
-            for i, n in enumerate(names):
-                with s_row[i]: score_ph[n] = st.empty()
-            g_row = st.columns(len(names))
-            for i, n in enumerate(names):
-                with g_row[i]: game_ph[n] = st.empty()
+            with game_area:
+                s_row = st.columns(len(names))
+                for i, n in enumerate(names):
+                    with s_row[i]: score_ph[n] = st.empty()
+                g_row = st.columns(len(names))
+                for i, n in enumerate(names):
+                    with g_row[i]: game_ph[n] = st.empty()
 
         for fi in range(max_f):
+            # Crucial check: if user clicked stop, session_state.is_playing will be false in NEXT run,
+            # but we can't easily detect the button click INSIDE this loop without st.rerun or fragments.
+            # HOWEVER, Streamlit buttons in loops are tricky.
+            # The best way in current version is to use a placeholder for the stop button that actually works.
+            # But the Stop button already calls st.rerun(). 
+            # If the user clicks "Stop", the script restarts, and is_playing is False, so the loop doesn't run.
+            
             for name in names:
                 frames  = all_frames[name]
                 is_done = fi >= len(frames) - 1
@@ -496,6 +493,7 @@ if "results" in st.session_state:
                 game_ph[name].pyplot(fig, use_container_width=True)
                 plt.close(fig)
                 cur = int(np.sum(frame == 1) + np.sum(frame == 2) - 1)
+                
                 if done_fl[name]:
                     dlabel = death_icons.get(all_deaths[name], "💀")
                     score_ph[name].markdown(
@@ -513,7 +511,12 @@ if "results" in st.session_state:
                         f"<div style='font-size:1.8rem; font-weight:800; color:{color};'>{cur}</div>"
                         f"<div style='color:#10b981; font-size:0.75rem; font-weight:600; margin-top:4px;'>▶ Playing</div>"
                         f"</div>", unsafe_allow_html=True)
+            
             time.sleep(play_speed / 1000)
+            
+        # End of loop
+        st.session_state.is_playing = False
+        st.rerun()
 
     # ── Performance summary ───────────────────────────────────────────────────
     st.markdown("<hr class='glow-divider'>", unsafe_allow_html=True)
@@ -564,7 +567,7 @@ if "results" in st.session_state:
         for n, res in results.items():
             raw = res[key]
             sm  = smooth(raw, w)
-            ax.plot(raw, alpha=0.15 if is_light else 0.08, color=res["color"], linewidth=0.8)
+            ax.plot(raw, alpha=0.08, color=res["color"], linewidth=0.8)
             ax.plot(np.linspace(0, len(raw), len(sm)), sm,
                     color=res["color"], linewidth=2.2, label=n)
         style_ax(ax, title, "Episode", ylabel)
